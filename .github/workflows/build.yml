@@ -1,6 +1,7 @@
 name: Build Windows Terminal Fork
 
 on:
+  workflow_dispatch:
   push:
     branches: [wincli/*]
     tags: ['v*']
