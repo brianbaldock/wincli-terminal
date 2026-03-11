@@ -28,11 +28,13 @@ jobs:
         uses: microsoft/setup-msbuild@v2
 
       - name: Restore NuGet
-        run: nuget restore OpenConsole.sln
+        run: |
+          nuget restore OpenConsole.slnx
+          nuget restore dep\nuget\packages.config
 
       - name: Build Release x64
         run: |
-          msbuild OpenConsole.sln `
+          msbuild OpenConsole.slnx `
             /p:Configuration=Release `
             /p:Platform=x64 `
             /m `
