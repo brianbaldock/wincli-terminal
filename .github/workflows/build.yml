@@ -53,6 +53,7 @@ jobs:
 
       - name: Restore NuGet
         run: |
+          nuget sources add -Name nuget.org -Source https://api.nuget.org/v3/index.json -ConfigFile NuGet.config
           nuget restore OpenConsole.slnx
           nuget restore dep\nuget\packages.config
 
@@ -62,8 +63,7 @@ jobs:
             /p:Configuration=Release `
             /p:Platform=x64 `
             /m `
-            /p:RestorePackages=false `
-            /t:Terminal\WindowsTerminal
+            /p:RestorePackages=false
 
       - name: Package artifacts
         run: |
