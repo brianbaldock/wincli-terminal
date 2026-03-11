@@ -24,16 +24,16 @@ jobs:
             Write-Host "SDK 10.0.22621.0 already installed"
             return
           }
-          Write-Host "Installing Windows 11 SDK 10.0.22621.0 via VS Installer..."
-          $vsWhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
-          $installPath = & $vsWhere -latest -property installationPath
-          $vsModify = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\setup.exe"
-          & $vsModify modify --installPath $installPath `
-            --add Microsoft.VisualStudio.Component.Windows11SDK.22621 `
-            --quiet --norestart --wait
-          if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010) {
-            throw "VS Installer failed with exit code $LASTEXITCODE"
+          Write-Host "Downloading Windows 11 SDK 10.0.22621..."
+          $installer = "$env:TEMP\winsdksetup.exe"
+          Invoke-WebRequest -Uri "https://go.microsoft.com/fwlink/?linkid=2196241" -OutFile $installer
+          Write-Host "Installing SDK (this takes a few minutes)..."
+          Start-Process -FilePath $installer -ArgumentList "/features OptionId.DesktopCPPx64 /quiet /norestart /log $env:TEMP\sdk-install.log" -Wait -NoNewWindow
+          if (!(Test-Path $sdkPath)) {
+            Get-Content "$env:TEMP\sdk-install.log" -Tail 20 -ErrorAction SilentlyContinue
+            throw "SDK installation failed - path not found after install"
           }
+          Write-Host "SDK 10.0.22621.0 installed successfully"
 
       - name: Cache NuGet packages
         uses: actions/cache@v4
