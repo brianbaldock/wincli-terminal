@@ -62,7 +62,8 @@ jobs:
             /p:Configuration=Release `
             /p:Platform=x64 `
             /m `
-            /p:RestorePackages=false
+            /p:RestorePackages=false `
+            /t:Terminal\WindowsTerminal
 
       - name: Package artifacts
         run: |
