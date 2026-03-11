@@ -66,8 +66,25 @@ jobs:
             /p:RestorePackages=false
 
       - name: Package artifacts
+        shell: pwsh
         run: |
-          $outDir = "src\cascadia\WindowsTerminal\bin\x64\Release"
+          # Find the actual output directory
+          $candidates = @(
+            "src\cascadia\WindowsTerminal\bin\x64\Release",
+            "bin\x64\Release",
+            "src\cascadia\WindowsTerminal\x64\Release"
+          )
+          $outDir = $null
+          foreach ($c in $candidates) {
+            if (Test-Path $c) { $outDir = $c; break }
+          }
+          if (-not $outDir) {
+            Write-Host "Searching for WindowsTerminal.exe..."
+            $exe = Get-ChildItem -Recurse -Filter "WindowsTerminal.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+            if ($exe) { $outDir = $exe.DirectoryName }
+          }
+          if (-not $outDir) { throw "Could not find build output directory" }
+          Write-Host "Found output at: $outDir"
           Compress-Archive -Path "$outDir\*" -DestinationPath "WindowsTerminal-x64.zip"
 
       - name: Upload artifact
